@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { FaCog, FaBook } from "react-icons/fa";
 import { FaInfo } from "react-icons/fa6";
+import axios from "axios";
 
 const Container = styled.div`
   background-color: #121212;
@@ -28,7 +29,7 @@ const InputAreaContainer = styled.div`
   flex-direction: column;
   align-items: stretch;
   gap: 1rem;
-  width: 100%;
+  width: 95%;
   max-width: 600px;
   margin: 0 auto;
 `;
@@ -37,6 +38,13 @@ const InputRow = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
+`;
+const ButtonRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
 `;
 
 const InputArea = styled.textarea`
@@ -66,6 +74,7 @@ const AddLinkContainer = styled.div`
 
 const Button = styled.button`
   padding: 0.75rem 1.5rem;
+  width: 10em;
   margin: 0.5em;
   font-size: 1rem;
   font-weight: bold;
@@ -91,7 +100,7 @@ const GearButton = styled.div`
   position: absolute;
   top: 20px;
   right: 20px;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   cursor: pointer;
   color: #ffffff;
   transition: transform 0.3s ease;
@@ -146,7 +155,7 @@ const TextButton = styled.button`
   background: none;
   border: none;
   color: var(--text-primary);
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   cursor: pointer;
   margin-left: 1rem;
   transition: transform 0.2s ease;
@@ -163,7 +172,7 @@ const InfoButton = styled.button`
   background: none;
   border: none;
   color: var(--text-primary);
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   cursor: pointer;
   margin-left: 1rem;
   transition: transform 0.2s ease;
@@ -179,7 +188,7 @@ const TextPanel = styled.div`
   right: ${({ isOpen }) => (isOpen ? "0" : "-100%")};
   width: 400px;
   height: 100%;
-  background-color: rgba(40, 50, 70, 0.8);
+  background-color: rgba(40, 50, 70, 0.9);
   color: var(--text-primary);
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
   transition: right 0.5s ease-in-out;
@@ -193,7 +202,7 @@ const InfoPanel = styled.div`
   right: ${({ isOpen }) => (isOpen ? "0" : "-100%")};
   width: 400px;
   height: 100%;
-  background-color: rgba(40, 50, 70, 0.8);
+  background-color: rgba(40, 50, 70, 0.9);
   color: var(--text-primary);
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
   transition: right 0.5s ease-in-out;
@@ -215,6 +224,40 @@ const LoadingIndicator = styled.div`
   font-size: 1rem;
   color: var(--text-secondary);
 `;
+
+const QuizContainer = styled.div`
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+`;
+
+const Question = styled.div`
+  margin-bottom: 1.5rem;
+`;
+
+const CorrectAnswer = styled.div`
+  margin-top: 0.5rem;
+  color: green;
+  font-weight: bold;
+  display: ${({ isVisible }) => (isVisible ? "block" : "none")};
+`;
+
+const RevealButton = styled.button`
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--primary-color-dark);
+  }
+`;
+
 const envInfo = {
   local: { api: "http://localhost:1000" },
   prod: { api: "<API_URL>" },
@@ -238,11 +281,37 @@ const HomePage = () => {
   const [infoText, setInfotext] = useState(
     "Paste links one line at a time into text area.\n\nReview them in the Text window.\n\nReview Settings window for number of questions.\n\nEnter your Open AI key.\n\nClick generate quiz for a customized quiz on the material."
   );
-
-  const handleQuizGeneration = () => {
-    console.log("Text Input:", textInput);
-    alert("Quiz generation is not yet implemented!");
+  const [quizResponse, setQuizResponse] = useState(null);
+  const [quizResponseText, setQuizResponseText] = useState(null);
+  const [isQuizLoading, setIsQuizLoading] = useState(false);
+  const [quizResult, setQuizResult] = useState("");
+  const [quizAnswers, setQuizAnswers] = useState("");
+  const axiosInstance = axios.create({
+    baseURL: envInfo[activeEnv]["api"],
+    withCredentials: true,
+  });
+  const handleQuizGeneration = async () => {
+    setIsQuizLoading(true);
+    try {
+      const response = await axiosInstance.post("/generateQuiz", {
+        aiKey: openAIKey,
+        difficulties: [easyCount, mediumCount, difficultCount],
+      });
+      const data = await response.data;
+      console.log(data.quiz);
+      if (typeof data.quiz === "string") {
+        setQuizResponseText(data.quiz);
+      } else {
+        setQuizResponse(data.quiz);
+      }
+    } catch (error) {
+      setQuizResponseText("Quiz could not be generated.");
+      console.error(error);
+    } finally {
+      setIsQuizLoading(false);
+    }
   };
+
   const handleAddLink = () => {
     setTextInput((prev) => "" + (prev ? "\n" + prev : ""));
   };
@@ -258,18 +327,11 @@ const HomePage = () => {
     setIsTextPanelOpen(true);
     setIsTextLoading(true);
     try {
-      const response = await fetch(envInfo[activeEnv]["api"] + "/getText", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          links: extractLinks(),
-        }),
+      const response = await axiosInstance.post("/getText", {
+        links: extractLinks(),
       });
-
-      const data = await response.json();
-      setAbsorbedText(data.text);
+      let res = response.data;
+      setAbsorbedText(res.text);
     } catch (error) {
       setAbsorbedText("No text found.");
       console.error(error);
@@ -392,12 +454,53 @@ const HomePage = () => {
             as="textarea"
             rows={10}
           />
-          <Button onClick={handleAddLink}>Add Link</Button>
         </InputRow>
+        <ButtonRow>
+          {/* <Button onClick={handleAddLink}>Add Link</Button> */}
+          <Button onClick={handleQuizGeneration}>Generate Quiz</Button>
+        </ButtonRow>
       </InputAreaContainer>
-      <Button onClick={handleQuizGeneration}>Generate Quiz</Button>
+      {quizResponseText && (
+        <>
+          <h4>Quiz Generation</h4>
+          <TextContent>{quizResponseText}</TextContent>
+        </>
+      )}
+      {isQuizLoading ? (
+        <LoadingIndicator>Loading...</LoadingIndicator>
+      ) : (
+        <>{quizResponse && <Quiz quizResponse={quizResponse} />}</>
+      )}
     </Container>
   );
 };
+
+function Quiz({ quizResponse }) {
+  const [revealAnswers, setRevealAnswers] = useState(false);
+
+  if (!quizResponse) return null;
+
+  return (
+    <QuizContainer>
+      <h2>{quizResponse.title}</h2>
+      {quizResponse.questions.map((question, index) => (
+        <Question key={index}>
+          <h4>{`${question.number}. ${question.text}`}</h4>
+          <ul>
+            {question.options.map((option, idx) => (
+              <li key={idx}>{option}</li>
+            ))}
+          </ul>
+          <CorrectAnswer isVisible={revealAnswers}>
+            Correct Answer: {question.correct_answer}
+          </CorrectAnswer>
+        </Question>
+      ))}
+      <RevealButton onClick={() => setRevealAnswers(!revealAnswers)}>
+        {revealAnswers ? "Hide Answers" : "Reveal Answers"}
+      </RevealButton>
+    </QuizContainer>
+  );
+}
 
 export default HomePage;
