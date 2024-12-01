@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/quizard/static/css/main.c1e65a40.css",
-    "main.js": "/quizard/static/js/main.aeaaa859.js",
-    "index.html": "/quizard/index.html",
-    "main.c1e65a40.css.map": "/quizard/static/css/main.c1e65a40.css.map",
-    "main.aeaaa859.js.map": "/quizard/static/js/main.aeaaa859.js.map"
+    "main.css": "/QuizardWeb/static/css/main.c1e65a40.css",
+    "main.js": "/QuizardWeb/static/js/main.3128bc96.js",
+    "index.html": "/QuizardWeb/index.html",
+    "main.c1e65a40.css.map": "/QuizardWeb/static/css/main.c1e65a40.css.map",
+    "main.3128bc96.js.map": "/QuizardWeb/static/js/main.3128bc96.js.map"
   },
   "entrypoints": [
     "static/css/main.c1e65a40.css",
-    "static/js/main.aeaaa859.js"
+    "static/js/main.3128bc96.js"
   ]
 }
