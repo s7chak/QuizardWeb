@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/QuizardWeb/static/css/main.c1e65a40.css",
+    "main.js": "/QuizardWeb/static/js/main.3128bc96.js",
+    "index.html": "/QuizardWeb/index.html",
+    "main.c1e65a40.css.map": "/QuizardWeb/static/css/main.c1e65a40.css.map",
+    "main.3128bc96.js.map": "/QuizardWeb/static/js/main.3128bc96.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c1e65a40.css",
+    "static/js/main.3128bc96.js"
+  ]
+}

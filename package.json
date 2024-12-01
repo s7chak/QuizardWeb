@@ -1,7 +1,7 @@
 {
   "name": "quizard",
   "version": "1.0.0",
-  "homepage": "https://s7chak.github.io/quizard",
+  "homepage": "https://s7chak.github.io/QuizardWeb",
   "private": false,
   "scripts": {
     "build": "react-scripts build",
@@ -29,8 +29,7 @@
     "react-scripts": "^5.0.1",
     "react-icons": "5.3.0",
     "axios": "^1.3.0",
-    "styled-components": "^5.3.10",
-    "gh-pages": "^5.0.0"
+    "styled-components": "^5.3.10"
   },
   "keywords": [],
   "devDependencies": {
