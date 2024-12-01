@@ -284,12 +284,13 @@ const HomePage = () => {
   const [quizResponse, setQuizResponse] = useState(null);
   const [quizResponseText, setQuizResponseText] = useState(null);
   const [isQuizLoading, setIsQuizLoading] = useState(false);
-  const [quizResult, setQuizResult] = useState("");
-  const [quizAnswers, setQuizAnswers] = useState("");
   const axiosInstance = axios.create({
     baseURL: envInfo[activeEnv]["api"],
     withCredentials: true,
   });
+  const handleSessionClear = async () => {
+    const response = await axiosInstance.get("/clearSessionz");
+  };
   const handleQuizGeneration = async () => {
     setIsQuizLoading(true);
     try {
@@ -302,18 +303,15 @@ const HomePage = () => {
       if (typeof data.quiz === "string") {
         setQuizResponseText(data.quiz);
       } else {
+        setQuizResponseText(null);
         setQuizResponse(data.quiz);
       }
     } catch (error) {
-      setQuizResponseText("Quiz could not be generated.");
+      setQuizResponseText("Quiz could not be generated: " + e);
       console.error(error);
     } finally {
       setIsQuizLoading(false);
     }
-  };
-
-  const handleAddLink = () => {
-    setTextInput((prev) => "" + (prev ? "\n" + prev : ""));
   };
 
   const extractLinks = () => {
@@ -355,7 +353,6 @@ const HomePage = () => {
       resetPanels();
     }
   };
-
   useEffect(() => {
     document.addEventListener("click", handleClickOutside);
     return () => {
@@ -365,7 +362,12 @@ const HomePage = () => {
 
   return (
     <Container ref={containerRef}>
-      <Header onClick={() => resetPanels()}>Quizard</Header>
+      <Header
+        onClick={() => resetPanels()}
+        onDoubleClick={() => handleSessionClear()}
+      >
+        Quizard
+      </Header>
       <GearButton onClick={() => setIsSettingsOpen(!isSettingsOpen)}>
         <FaCog />
       </GearButton>
