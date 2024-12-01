@@ -1,6 +1,7 @@
 {
   "name": "quizard",
   "version": "1.0.0",
+  "homepage": "https://s7chak.github.io/quizard",
   "private": false,
   "scripts": {
     "build": "react-scripts build",
