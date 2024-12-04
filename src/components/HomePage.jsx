@@ -260,9 +260,9 @@ const RevealButton = styled.button`
 
 const envInfo = {
   local: { api: "http://localhost:1000" },
-  prod: { api: "<API_URL>" },
+  prod: { api: "https://quizardapi-78191548528.us-west3.run.app/" },
 };
-const activeEnv = "local";
+const activeEnv = "prod";
 
 const HomePage = () => {
   const containerRef = useRef(null);
@@ -307,7 +307,7 @@ const HomePage = () => {
         setQuizResponse(data.quiz);
       }
     } catch (error) {
-      setQuizResponseText("Quiz could not be generated: " + e);
+      setQuizResponseText("Quiz could not be generated: " + error);
       console.error(error);
     } finally {
       setIsQuizLoading(false);
