@@ -296,6 +296,7 @@ const HomePage = () => {
     try {
       const response = await axiosInstance.post("/generateQuiz", {
         aiKey: openAIKey,
+        links: extractLinks(),
         difficulties: [easyCount, mediumCount, difficultCount],
       });
       const data = await response.data;
@@ -307,8 +308,11 @@ const HomePage = () => {
         setQuizResponse(data.quiz);
       }
     } catch (error) {
-      setQuizResponseText("Quiz could not be generated: " + error);
-      console.error(error);
+      console.log(error);
+      setQuizResponseText(
+        "Quiz could not be generated: " + error + "<br/>" + error.quiz
+      );
+      // console.error(error);
     } finally {
       setIsQuizLoading(false);
     }
@@ -465,7 +469,13 @@ const HomePage = () => {
       {quizResponseText && (
         <>
           <h4>Quiz Generation</h4>
-          <TextContent>{quizResponseText}</TextContent>
+          <div
+            dangerouslySetInnerHTML={{
+              __html:
+                quizResponseText.replace(/\n/g, "<br />") ||
+                "No text loaded yet.",
+            }}
+          />
         </>
       )}
       {isQuizLoading ? (
