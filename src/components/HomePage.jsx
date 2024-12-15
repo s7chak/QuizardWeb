@@ -310,7 +310,10 @@ const HomePage = () => {
     } catch (error) {
       console.log(error);
       setQuizResponseText(
-        "Quiz could not be generated: " + error + "<br/>" + error.quiz
+        "Quiz could not be generated: " +
+          error +
+          "<br/>" +
+          error.response.data.quiz
       );
       // console.error(error);
     } finally {
